@@ -1,6 +1,6 @@
 ## vk_keyboard_generator
 
-Генератор клавиатур для социальной сети ВК.
+Генератор клавиатур для социальной сети ВК. </br>
 Для работы нужен python3+
 
 ---
@@ -14,6 +14,6 @@
 
 ---
 
-Проверить клавиатуру можно здесь: [клаво-бот](https://vk.com/public174472256)
-JSON-клавиатуры: [тык](https://severecloud.github.io/vk-keyboard/)
-Golang-клавиатуры: [тык выше или тут](https://severecloud.github.io/vk-keyboard/)
+Проверить клавиатуру можно здесь: [клаво-бот](https://vk.com/public174472256) </br>
+JSON-клавиатуры: [тык](https://severecloud.github.io/vk-keyboard/) </br>
+Golang-клавиатуры: [тык выше или тут](https://severecloud.github.io/vk-keyboard/) </br>
