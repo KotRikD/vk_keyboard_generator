@@ -35,7 +35,7 @@ class VKRow:
         if len(formatted_payload)<1:
             raise ValueError("Payload пустой")
 
-        formatted_payload = json.dumps(payload)
+        formatted_payload = json.dumps(payload, ensure_ascii=False)
 
         self.keyboard.buttons[self.row].append(dict(
             action=dict(
@@ -62,7 +62,55 @@ class VKKeyboard:
 
     def __init__(self):
         self.one_time = False
+        self.inline = False
         self.buttons = []
+
+    def lazy_buttons(self, obj):
+        '''
+        Специальный объект лейзи батонов
+
+        :param dict obj: Объект
+        '''
+        if obj.get('one_time', False):
+            self.one_time = True
+        
+        if obj.get('inline', False):
+            self.one_time = False
+            self.inline = True
+
+        count = 0
+        while len(obj['buttons']) > 1:
+            row_x = 0
+            if len(self.buttons)<count+1:
+                self.add_row()
+            row_editor = self.edit_row(count)
+            while row_x != 4:
+                row_editor.add_button(
+                    obj['buttons'][0]['text'],
+                    payload=obj['buttons'][0]['payload'],
+                    color=obj['buttons'][0]['color']
+                )
+                
+                del(obj['buttons'][0])
+                row_x+=1
+            
+            count+=1
+        
+        return True
+
+    def set_inline(self, status):
+        '''
+        Устанавливает inlin-ость кнопки
+
+        :param bool status: True или False
+        '''
+        if status:
+            self.inline = True
+            self.one_time = False
+            return status
+        
+        self.inline = False
+        return status
 
     def set_one_time(self, onetime):
         '''
@@ -70,7 +118,12 @@ class VKKeyboard:
 
         :param bool onetime: True или False
         '''
-        self.one_time = onetime
+        if onetime and self.inline is False:
+            self.one_time = True
+            return onetime
+        
+        self.one_time = False
+        return onetime
 
     def check_keyboard(self):
         for row in self.buttons:
@@ -83,8 +136,9 @@ class VKKeyboard:
         '''
         Добавляет ряд с кнопками
         '''
-        if len(self.buttons)+1>10:
-            raise ValueError("Количество рядов с кнопками превышает лимит (10 шт.)")
+        max_rows = 10 if self.inline is False else 6
+        if len(self.buttons)+1>max_rows:
+            raise ValueError(f"Количество рядов с кнопками превышает лимит ({max_rows} шт.)")
         
         self.buttons.append([])
         return True
@@ -118,6 +172,7 @@ class VKKeyboard:
         
         return dict(
             one_time=self.one_time,
+            inline=self.inline,
             buttons=self.buttons
         )
     
@@ -127,5 +182,6 @@ class VKKeyboard:
 
         return json.dumps(dict(
             one_time=self.one_time,
+            inline=self.inline,
             buttons=self.buttons
         ), ensure_ascii=False)
