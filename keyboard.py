@@ -79,7 +79,7 @@ class VKKeyboard:
             self.inline = True
 
         count = 0
-        while len(obj['buttons']) > 1:
+        while len(obj['buttons']) > 0:
             row_x = 0
             if len(self.buttons)<count+1:
                 self.add_row()
@@ -93,6 +93,8 @@ class VKKeyboard:
                 
                 del(obj['buttons'][0])
                 row_x+=1
+                if len(obj['buttons']) < 1:
+                    row_x = 4
             
             count+=1
         
