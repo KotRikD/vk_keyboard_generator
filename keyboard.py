@@ -89,8 +89,6 @@ class VKKeyboard:
                 if len(self.buttons)<row_id+1:
                     self.add_row()
                 row_editor = self.edit_row(row_id)
-                if len(row)+1>MAX_BUTTONS:
-                    raise ValueError("Количество кнопок превышает лимит (4 шт.)")
 
                 for button in row:
                     row_editor.add_button(
