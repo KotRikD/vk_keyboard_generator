@@ -1,5 +1,9 @@
 import json
 
+MAX_BUTTONS = 4
+MAX_ROW_BUTTONS = 10
+MAX_ROW_INLINE_BUTTONS = 6
+
 class VKRow:
 
     def __init__(self, keyboard, row):
@@ -15,7 +19,7 @@ class VKRow:
         :param str payload: Полезная нагрузка кнопки
         :param str color: Цвет кнопки
         '''
-        if len(self.keyboard.buttons[self.row])+1>4:
+        if len(self.keyboard.buttons[self.row])+1>MAX_BUTTONS:
             raise ValueError("Количество кнопок превышает лимит (4 шт.)")
 
         if not color in self.allowed_types:
@@ -78,23 +82,42 @@ class VKKeyboard:
             self.one_time = False
             self.inline = True
 
+        if all([type(row) in (list, tuple) for row in obj['buttons']]):
+            # Так, это у нас массивы в массиве
+            row_id = 0
+            for row in obj['buttons']:
+                if len(self.buttons)<row_id+1:
+                    self.add_row()
+                row_editor = self.edit_row(row_id)
+                if len(row)+1>MAX_BUTTONS:
+                    raise ValueError("Количество кнопок превышает лимит (4 шт.)")
+
+                for button in row:
+                    row_editor.add_button(
+                        button.get('text', "button"),
+                        payload=button.get('payload', {}),
+                        color=button.get('color', 'primary')
+                    )
+                row_id+=1
+            return True
+
         count = 0
         while len(obj['buttons']) > 0:
             row_x = 0
             if len(self.buttons)<count+1:
                 self.add_row()
             row_editor = self.edit_row(count)
-            while row_x != 4:
+            while row_x != MAX_BUTTONS:
                 row_editor.add_button(
-                    obj['buttons'][0]['text'],
-                    payload=obj['buttons'][0]['payload'],
-                    color=obj['buttons'][0]['color']
+                    obj['buttons'][0].get('text', "button"),
+                    payload=obj['buttons'][0].get('payload', {}),
+                    color=obj['buttons'][0].get('color', 'primary')
                 )
                 
                 del(obj['buttons'][0])
                 row_x+=1
                 if len(obj['buttons']) < 1:
-                    row_x = 4
+                    row_x = MAX_BUTTONS
             
             count+=1
         
@@ -138,7 +161,7 @@ class VKKeyboard:
         '''
         Добавляет ряд с кнопками
         '''
-        max_rows = 10 if self.inline is False else 6
+        max_rows = MAX_ROW_BUTTONS if self.inline is False else MAX_ROW_INLINE_BUTTONS
         if len(self.buttons)+1>max_rows:
             raise ValueError(f"Количество рядов с кнопками превышает лимит ({max_rows} шт.)")
         
