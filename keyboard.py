@@ -1,6 +1,6 @@
 import json
 
-MAX_BUTTONS = 4
+MAX_BUTTONS = 5
 MAX_ROW_BUTTONS = 10
 MAX_ROW_INLINE_BUTTONS = 6
 
@@ -8,22 +8,23 @@ MAX_ROW_INLINE_BUTTONS = 6
 class VKRow:
 
     def __init__(self, keyboard, row):
-        self.action_types = ['text', 'location']
+        self.action_types = ['text', 'location', 'open_link']
         self.allowed_types = ['primary', 'default', 'negative', 'positive']
         self.keyboard = keyboard
         self.row = row
 
-    def add_button(self, button_type, label, payload, color="default"):
+    def add_button(self, button_type, label, link, payload, color="default"):
         '''
         Добавляет кнопку
 
         :param button_type: Тип кнопки
         :param label: Название кнопки
+        :param link: Ссылка кнопки
         :param str payload: Полезная нагрузка кнопки
         :param str color: Цвет кнопки
         '''
         if len(self.keyboard.buttons[self.row]) + 1 > MAX_BUTTONS:
-            raise ValueError("Количество кнопок превышает лимит (4 шт.)")
+            raise ValueError("Количество кнопок превышает лимит (5 шт.)")
 
         if not color in self.allowed_types:
             raise ValueError("Невалидный цвет кнопки")
@@ -56,11 +57,20 @@ class VKRow:
                 ),
                 color=color
             ))
-        else:
+        elif button_type == "location":
             self.keyboard.buttons[self.row].append(dict(
                 action=dict(
                     type=button_type,
                     payload=formatted_payload
+                ),
+            ))
+        elif button_type == "open_link":
+            self.keyboard.buttons[self.row].append(dict(
+                action=dict(
+                    type=button_type,
+                    payload=formatted_payload,
+                    label=label,
+                    link=link
                 ),
             ))
 
@@ -109,6 +119,7 @@ class VKKeyboard:
                     row_editor.add_button(
                         button_type=button.get('type', 'text'),
                         label=button.get('label', "button"),
+                        link=button.get('link', None),
                         payload=button.get('payload', {}),
                         color=button.get('color', 'primary')
                     )
@@ -125,6 +136,7 @@ class VKKeyboard:
                 row_editor.add_button(
                     button_type=obj['buttons'][0].get('type', 'text'),
                     label=obj['buttons'][0].get('label', "button"),
+                    link=obj['buttons'][0].get('link', None),
                     payload=obj['buttons'][0].get('payload', {}),
                     color=obj['buttons'][0].get('color', 'primary')
                 )

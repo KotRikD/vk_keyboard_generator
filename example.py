@@ -57,7 +57,7 @@ keyboard.lazy_buttons({
             {'type': 'location', 'payload': {'some_key': 'Полезная нагрузка 9'}}
         ],
         [
-            {'text': 'Кнопка 10', 'payload': {'some_key': 'Полезная нагрузка 10'}, 'color': 'default'}
+            {'type': 'open_link', 'label': 'Кнопка 10', 'link': 'url', 'payload': {'some_key': 'Полезная нагрузка 10'}}
         ]
     ]
 })  # и того мы получим клавиатуру с inline-кнопками, 4 рядами и 13 кнопками, ЧОРТ ПОБЕРИ МАГИЯ, КАК НЕ ПОСМОТРИ!
